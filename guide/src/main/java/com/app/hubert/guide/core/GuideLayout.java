@@ -1,8 +1,9 @@
 package com.app.hubert.guide.core;
 
 import android.content.Context;
-import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
@@ -36,6 +37,7 @@ public class GuideLayout extends FrameLayout {
 
     private Controller controller;
     private Paint mPaint;
+    private Paint mStrokePaint;
     public GuidePage guidePage;
     private OnGuideLayoutDismissListener listener;
 
@@ -62,9 +64,15 @@ public class GuideLayout extends FrameLayout {
 
         //设置画笔遮罩滤镜,可以传入BlurMaskFilter或EmbossMaskFilter，前者为模糊遮罩滤镜而后者为浮雕遮罩滤镜
         //这个方法已经被标注为过时的方法了，如果你的应用启用了硬件加速，你是看不到任何阴影效果的
-        mPaint.setMaskFilter(new BlurMaskFilter(10, BlurMaskFilter.Blur.INNER));
+//      mPaint.setMaskFilter(new BlurMaskFilter(10, BlurMaskFilter.Blur.INNER));
         //关闭当前view的硬件加速
         setLayerType(LAYER_TYPE_SOFTWARE, null);
+
+        mStrokePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mStrokePaint.setStyle(Paint.Style.STROKE);
+        mStrokePaint.setStrokeWidth(3);
+        mStrokePaint.setColor(Color.parseColor("#33A1FF"));
+        mStrokePaint.setPathEffect(new DashPathEffect(new float[]{12, 8}, 0));
 
         //ViewGroup默认设定为true，会使onDraw方法不执行，如果复写了onDraw(Canvas)方法，需要清除此标记
         setWillNotDraw(false);
@@ -86,16 +94,20 @@ public class GuideLayout extends FrameLayout {
                 switch (highLight.getShape()) {
                     case CIRCLE:
                         canvas.drawCircle(rectF.centerX(), rectF.centerY(), highLight.getRadius(), mPaint);
+                        canvas.drawCircle(rectF.centerX(), rectF.centerY(), highLight.getRadius(), mStrokePaint);
                         break;
                     case OVAL:
                         canvas.drawOval(rectF, mPaint);
+                        canvas.drawOval(rectF, mStrokePaint);
                         break;
                     case ROUND_RECTANGLE:
                         canvas.drawRoundRect(rectF, highLight.getRound(), highLight.getRound(), mPaint);
+                        canvas.drawRoundRect(rectF, highLight.getRound(), highLight.getRound(), mStrokePaint);
                         break;
                     case RECTANGLE:
                     default:
                         canvas.drawRect(rectF, mPaint);
+                        canvas.drawRect(rectF, mStrokePaint);
                         break;
                 }
             }
